@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1525
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFC_PingTest", "MFC_PingTest.vcxproj", "{C3974045-81A7-4824-8E54-C2C1002E15CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3974045-81A7-4824-8E54-C2C1002E15CD}.Debug|x64.ActiveCfg = Debug|x64
+		{C3974045-81A7-4824-8E54-C2C1002E15CD}.Debug|x64.Build.0 = Debug|x64
+		{C3974045-81A7-4824-8E54-C2C1002E15CD}.Debug|x86.ActiveCfg = Debug|Win32
+		{C3974045-81A7-4824-8E54-C2C1002E15CD}.Debug|x86.Build.0 = Debug|Win32
+		{C3974045-81A7-4824-8E54-C2C1002E15CD}.Release|x64.ActiveCfg = Release|x64
+		{C3974045-81A7-4824-8E54-C2C1002E15CD}.Release|x64.Build.0 = Release|x64
+		{C3974045-81A7-4824-8E54-C2C1002E15CD}.Release|x86.ActiveCfg = Release|Win32
+		{C3974045-81A7-4824-8E54-C2C1002E15CD}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5822C3BD-1275-4EBE-8BCC-D9F29E666ABE}
+	EndGlobalSection
+EndGlobal
