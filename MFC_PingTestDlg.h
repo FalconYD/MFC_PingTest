@@ -34,7 +34,10 @@ protected:
 
 public:
 	std::thread m_thPing;
-	void WriteLog(const char* msg);
+	std::string m_strIP;
+	double		m_dDelay;
+	void WriteLog(LPCTSTR strMsg, ...);
+	void FileLoad();
 	static int THREAD_PING();
 	void fn_PingTest();
 };

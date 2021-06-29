@@ -15,6 +15,13 @@
 #include <Icmpapi.h>
 #include <WS2tcpip.h>
 #include <thread>
+#include <queue>
+#include <fstream>
+#include "define_Function.h"
+#include "define_Static.h"
+#include "define_Struct.h"
+#include "FileManager.h"
+#include "LogManager.h"
 
 #pragma comment(lib, "Iphlpapi")
 #pragma comment(lib, "wsock32")

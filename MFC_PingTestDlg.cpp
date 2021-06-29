@@ -100,8 +100,10 @@ BOOL CMFCPingTestDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	FileLoad();
 	m_thPing = std::thread(THREAD_PING);
 	//"Program Start. IP : {resource.IPAdd}, Ping Delay : {resource.PingDelay}"
+	WriteLog(_T("Program Start. IP : %s, Ping Delay : %lf"), m_strIP.c_str(), m_dDelay);
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -163,6 +165,11 @@ int CMFCPingTestDlg::THREAD_PING()
 	}
 }
 
+void CMFCPingTestDlg::FileLoad()
+{
+	//FileManager::INILoad("", "", "");
+}
+
 void CMFCPingTestDlg::fn_PingTest()
 {
 	HANDLE hIcmpFile;
@@ -203,7 +210,21 @@ void CMFCPingTestDlg::fn_PingTest()
 	IcmpCloseHandle(hIcmpFile);
 }
 
-void CMFCPingTestDlg::WriteLog(const char* msg)
+void CMFCPingTestDlg::WriteLog(LPCTSTR strMsg, ...)
 {
-	//((CListBox*)GetDlgItem(IDC_LIST_MSG))->AddString("");
+	TCHAR chBuff[MAXSTRINGLENGTH * 2] = { 0, };
+	char buff[MAXSTRINGLENGTH] = { 0, };
+	va_list ap;
+	va_start(ap, strMsg);
+	int len = _vsctprintf(strMsg, ap) + 1; // for '\0'
+	TCHAR* pBuf = (TCHAR*)malloc(sizeof(TCHAR) * len);
+	if (pBuf)
+	{
+		_vstprintf_s(pBuf, len, strMsg, ap);
+		//if (fnWriteMessage != nullptr)	fnWriteMessage(pBuf);
+		((CListBox*)GetDlgItem(IDC_LIST_MSG))->AddString(pBuf);
+		free(pBuf);
+	}
+	va_end(ap);
+	
 }
