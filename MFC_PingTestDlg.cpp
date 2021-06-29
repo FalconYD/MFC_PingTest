@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CMFCPingTestDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -101,9 +102,10 @@ BOOL CMFCPingTestDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	FileLoad();
-	m_thPing = std::thread(THREAD_PING);
+	RunPingTest();
+	
 	//"Program Start. IP : {resource.IPAdd}, Ping Delay : {resource.PingDelay}"
-	WriteLog(_T("Program Start. IP : %s, Ping Delay : %lf"), m_strIP.c_str(), m_dDelay);
+	WriteLog(_T("Program Start. IP : %s, Ping Delay : %d ms"), m_strIP.c_str(), m_nDelay);
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -156,13 +158,38 @@ HCURSOR CMFCPingTestDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-int CMFCPingTestDlg::THREAD_PING()
+int CMFCPingTestDlg::THREAD_PING(void* pObject)
 {
-	while (true)
+	THREAD_PARAM* pParam = (THREAD_PARAM*)pObject;
+	CMFCPingTestDlg* pMain = (CMFCPingTestDlg*)pParam->cObjectPointer1;
+
+	pParam->enState = THREAD_STATUS::THREAD_STAT_ACTIVE;
+	while (pParam->bThreadFlag)
 	{
-		Sleep(10000);
-		//fn_PingTest();
+		Sleep(pParam->nScanInterval);
+
+		pMain->fn_PingTest();
+
+		pParam->enState = THREAD_STATUS::THREAD_STAT_RUNNING;
 	}
+
+	pParam->enState = THREAD_STATUS::THREAD_STAT_COMPLETE;
+}
+
+void CMFCPingTestDlg::RunPingTest()
+{
+	m_stThreadParam.bThreadFlag = true;
+	m_stThreadParam.cObjectPointer1 = this;
+	m_stThreadParam.enState = THREAD_STATUS::THREAD_STAT_NONE;
+	m_stThreadParam.nScanInterval = m_nDelay;
+
+	m_thPing = std::thread(THREAD_PING, &m_stThreadParam);
+}
+
+void CMFCPingTestDlg::StopPingTest()
+{
+	m_stThreadParam.bThreadFlag = false;
+	m_thPing.join();
 }
 
 void CMFCPingTestDlg::FileLoad()
@@ -183,15 +210,15 @@ void CMFCPingTestDlg::fn_PingTest()
 	inet_pton(AF_INET, chIPAddr, &ipaddr);
 	if (ipaddr == INADDR_NONE)
 	{
-		printf("usage: %s IP address\n", chIPAddr);
+		WriteLog(_T("usage: %s IP address\n"), chIPAddr);
 		return;
 	}
 
 	hIcmpFile = IcmpCreateFile();
 	if (hIcmpFile == INVALID_HANDLE_VALUE)
 	{
-		printf("\tUnable to open handle.\n");
-		printf("IcmpCreatefile returned error: %ld\n", GetLastError());
+		WriteLog(_T("\tUnable to open handle.\n"));
+		WriteLog(_T("IcmpCreatefile returned error: %ld\n"), GetLastError());
 		return;
 	}
 
@@ -203,7 +230,7 @@ void CMFCPingTestDlg::fn_PingTest()
 		PICMP_ECHO_REPLY pEchoReply = (PICMP_ECHO_REPLY)szReplyBuffer;
 		struct in_addr ReplyAddr;
 		ReplyAddr.S_un.S_addr = pEchoReply->Address;
-		printf("\tSent icmp message to %s\n", chIPAddr);
+		WriteLog(_T("state : %d, %d ms"), pEchoReply->Status, pEchoReply->RoundTripTime);
 
 	}
 
@@ -221,10 +248,19 @@ void CMFCPingTestDlg::WriteLog(LPCTSTR strMsg, ...)
 	if (pBuf)
 	{
 		_vstprintf_s(pBuf, len, strMsg, ap);
-		//if (fnWriteMessage != nullptr)	fnWriteMessage(pBuf);
 		((CListBox*)GetDlgItem(IDC_LIST_MSG))->AddString(pBuf);
+		//_in_fn_Uni2Multi()
+		//mc_LogManager.PushLog(pBuf);
 		free(pBuf);
 	}
 	va_end(ap);
 	
+}
+
+void CMFCPingTestDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	StopPingTest();
 }

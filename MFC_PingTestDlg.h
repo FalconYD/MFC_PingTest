@@ -35,9 +35,15 @@ protected:
 public:
 	std::thread m_thPing;
 	std::string m_strIP;
-	double		m_dDelay;
+	unsigned int m_nDelay = 10000;
+	THREAD_PARAM m_stThreadParam;
+	LogManager mc_LogManager;
 	void WriteLog(LPCTSTR strMsg, ...);
 	void FileLoad();
-	static int THREAD_PING();
+	static int THREAD_PING(void* pObject);
 	void fn_PingTest();
+
+	void RunPingTest();
+	void StopPingTest();
+	afx_msg void OnDestroy();
 };
